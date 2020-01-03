@@ -136,7 +136,7 @@ class MemberController extends BaseController
             if (!isset($data['uid']) || empty($data['uid'])) {
                 return responseError('uid没传');
             }
-            $member = Member::getMemberOautch(array('o.openid' => $data['uid']));
+            $member = Member::getMemberOauth(array('o.openid' => $data['uid']));
             $country_id = Country::current()->id;
 
             $return['country_id'] = $country_id;

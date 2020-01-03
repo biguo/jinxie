@@ -30,7 +30,7 @@ class Member extends Authenticatable implements JWTSubject
     }
 
     //根据用户第三方登陆信息获取用户信息
-    public static function getMemberOautch($where)
+    public static function getMemberOauth($where)
     {
         return self::from('member as m')->where($where)
             ->join('member_oauth as o', 'm.id', '=', 'o.mid')
@@ -46,10 +46,6 @@ class Member extends Authenticatable implements JWTSubject
         $data['regip'] = $_SERVER['SERVER_ADDR'];
         $data = array_except($data, ['vercode', 'pphone', 'uid']);
         $mid = DB::table('member')->insertGetId($data);
-        $original = DB::connection('original')->table("member")->where('phone', $data['phone'])->first();  //同步此用户到app,但仅是同步手机号, 账户等信息不互通
-        if(!$original){
-            DB::connection('original')->table('member')->insert($data);
-        }
         return $mid;
     }
 

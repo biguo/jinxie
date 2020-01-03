@@ -5,17 +5,17 @@ return [
     /*
      * Laravel-admin name.
      */
-    'name'      => '冰火乡村民宿管理系统',
+    'name'      => '警察协会后台管理系统',
 
     /*
      * Logo in admin panel header.
      */
-    'logo'      => '<b>冰火乡村民宿</b> 管理',
+    'logo'      => '<b>警察协会后台</b> 管理',
 
     /*
      * Mini-logo in admin panel header.
      */
-    'logo-mini' => '<b>村</b>',
+    'logo-mini' => '<b>警</b>',
 
     /*
      * Laravel-admin url prefix.
@@ -30,7 +30,7 @@ return [
     /*
      * Laravel-admin html title.
      */
-    'title'  => '冰火乡村民宿|后台管理系统',
+    'title'  => '警察协会|后台管理系统',
 
     /*
      * Laravel-admin auth setting.
