@@ -2,8 +2,6 @@
 
 namespace App\Api\Controllers;
 
-use App\Models\Card;
-use App\Models\Country;
 use App\Models\Member;
 use App\Models\MemberOauth;
 use Illuminate\Http\Request;
@@ -29,7 +27,7 @@ class MemberController extends BaseController
             $member = Member::getMemberById($mid);
             $array = array();
             if ($member)
-                $array = array_only($member->toarray(), ['id', 'phone', 'headpic', 'nickname', 'description', 'point', 'leftamount']);
+                $array = array_only($member->toarray(), ['id', 'phone', 'headpic', 'nickname', 'description']);
             $array['cardNum'] = count($member->cards);
             $card = $member->cards()->where('type','level')->first();
             if($card){

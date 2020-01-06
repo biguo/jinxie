@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 
-class Country extends Model
+class Center extends Model
 {
-    protected $table = 'country';
+    protected $table = 'center';
 
     public $timestamps = false;
 
@@ -37,20 +37,4 @@ class Country extends Model
             ->orderBy('sort', 'asc')->get();
     }
 
-    public function products()
-    {
-        return $this->hasMany(Product::class);
-    }
-
-    public function usedProduct()
-    {
-        return $this->products()->where('status', Status_Online)
-            ->select('id', 'title','price',DB::raw("concat('" . Upload_Domain . "', image) as image"),DB::raw("concat('" . Upload_Domain . "', icon) as icon"),'single','whole','coffee','wine','cake','sort', 'content')
-            ->orderBy('sort', 'asc')->get();
-    }
-
-    public function orders()
-    {
-        return $this->hasMany(Order::class);
-    }
 }

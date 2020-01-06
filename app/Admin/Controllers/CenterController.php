@@ -4,7 +4,7 @@ namespace App\Admin\Controllers;
 
 
 use App\Admin\Extensions\CheckRow;
-use App\Models\Country;
+use App\Models\Center;
 use Encore\Admin\Auth\Database\Administrator;
 use Encore\Admin\Auth\Database\Role;
 use Encore\Admin\Form;
@@ -15,7 +15,7 @@ use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
 use Illuminate\Support\MessageBag;
 
-class CountryController extends Controller
+class CenterController extends Controller
 {
     use ModelForm;
 
@@ -28,8 +28,8 @@ class CountryController extends Controller
     {
 
         return Admin::content(function (Content $content) {
-            $content->header('小程序设置');
-            $content->description('度假村小程序设置');
+            $content->header('分中心设置');
+            $content->description('分中心设置');
             $content->body($this->grid());
         });
     }
@@ -77,10 +77,10 @@ class CountryController extends Controller
      */
     protected function grid()
     {
-        return Admin::grid(Country::class, function (Grid $grid) {
+        return Admin::grid(Center::class, function (Grid $grid) {
 
-            $grid->model()->from('country as c')->leftJoin('admin_users as u','u.id','=','c.admin_user_id')
-                ->select('c.id','c.title','c.appid','c.appsecret','c.status','u.name as username');
+            $grid->model()->from('center as c')->leftJoin('admin_users as u', 'u.id', '=', 'c.admin_user_id')
+                ->select('c.id', 'c.title', 'c.status', 'u.name as username');
 
 //            $grid->disableCreation();
             $grid->disableFilter();
@@ -88,8 +88,6 @@ class CountryController extends Controller
 //            $grid->disableActions();
             $grid->column('id', 'ID');
             $grid->column('title', '项目名')->editable();
-            $grid->column('appid', '小程序id')->editable();
-            $grid->column('appsecret', '小程序secret')->editable();
             $grid->column('username', '设置管理员');
 
             $grid->status()->switch();
@@ -104,17 +102,17 @@ class CountryController extends Controller
      */
     protected function form()
     {
-        return Admin::form(Country::class, function (Form $form) {
+        return Admin::form(Center::class, function (Form $form) {
 
             $form->display('id', 'ID');
             $form->text('slug', 'slug')->rules('required|min:3');
             $form->text('title', 'title')->rules('required|min:3');
-            $form->text('appid', '小程序id');
-            $form->text('appsecret', '小程序secret');
             $form->hidden('status');
+
             $form->select('admin_user_id')->options(function () {
-                return Administrator::pluck('name', 'id');
-            })->default($this->mid);
+                $array = Administrator::pluck('name', 'id')->toarray();
+                return array_merge(['0' => '请选择'], $array);
+            })->default(0);
 //            $form->html(new CheckRow());
 //            $form->saving(function (Form $form) {
 

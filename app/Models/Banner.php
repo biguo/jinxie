@@ -8,7 +8,7 @@ class Banner extends Model
 {
     protected $table = 'banner';
 
-    public function country() {
-        return $this->belongsTo(Country::class);
+    public function center() {
+        return $this->belongsTo(Center::class);
     }
 }

@@ -12,7 +12,6 @@ Route::group([
 
     $router->get('/', 'HomeController@index');
     $router->resource('banner', BannerController::class);
-    $router->resource('country', CountryController::class);
-    $router->get('/orders', 'OrderController@index');
-    $router->resource('product', ProductController::class);
+    $router->resource('center', CenterController::class);
+
 });

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Country;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -23,7 +22,6 @@ class Controller extends BaseController
     {
         $this->request = $request;
         $this->mid = Auth::guard('admin')->user()->id;
-        $this->country = Country::where('admin_user_id', $this->mid)->value('id');
     }
 
 }

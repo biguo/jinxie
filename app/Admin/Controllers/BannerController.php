@@ -80,7 +80,7 @@ class BannerController extends Controller
     protected function grid()
     {
         return Admin::grid(Banner::class, function (Grid $grid) {
-            $grid->model()->where('country_id',$this->country)->orderBy('status', 'desc')->orderBy('sort')->orderBy('id', 'desc');
+            $grid->model()->orderBy('status', 'desc')->orderBy('sort')->orderBy('id', 'desc');
             $grid->disableExport();
             $grid->id('ID')->sortable();
             $grid->title()->editable();
@@ -121,7 +121,6 @@ class BannerController extends Controller
             $form->image('bigImage', '长图');
             $form->hidden('sort');
             $form->hidden('status');
-            $form->hidden('country_id','country_id')->default($this->country);
         });
     }
 }
