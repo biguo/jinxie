@@ -13,5 +13,6 @@ Route::group([
     $router->get('/', 'HomeController@index');
     $router->resource('banner', BannerController::class);
     $router->resource('center', CenterController::class);
+    $router->resource('user', UserController::class);
 
 });

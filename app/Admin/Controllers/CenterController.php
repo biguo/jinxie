@@ -111,7 +111,7 @@ class CenterController extends Controller
 
             $form->select('admin_user_id')->options(function () {
                 $array = Administrator::pluck('name', 'id')->toarray();
-                return array_merge(['0' => '请选择'], $array);
+                return ['0' => '请选择']+  $array;
             })->default(0);
 //            $form->html(new CheckRow());
 //            $form->saving(function (Form $form) {
