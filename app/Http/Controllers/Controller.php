@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Center;
+use App\Models\CenterUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -16,12 +18,13 @@ class Controller extends BaseController
 
     protected $request;
     protected $mid;
-    protected $country;
+    protected $center;
 
     public function __construct(Request $request)
     {
         $this->request = $request;
         $this->mid = Auth::guard('admin')->user()->id;
+        $this->center = CenterUser::where('user_id', $this->mid)->value('center_id');
     }
 
 }

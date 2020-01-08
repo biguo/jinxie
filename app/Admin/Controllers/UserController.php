@@ -2,6 +2,10 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Center;
+use App\Models\CenterUser;
+use App\Models\RoleUser;
+use App\Models\UserPermission;
 use Encore\Admin\Auth\Database\Administrator;
 use Encore\Admin\Auth\Database\Permission;
 use Encore\Admin\Auth\Database\Role;
@@ -10,8 +14,16 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
-use Illuminate\Routing\Controller;
+use App\Http\Controllers\Controller;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\MessageBag;
 
+
+/**
+ * 分中心管理
+ * Class UserController
+ * @package App\Admin\Controllers
+ */
 class UserController extends Controller
 {
     use ModelForm;
@@ -24,11 +36,33 @@ class UserController extends Controller
     public function index()
     {
         return Admin::content(function (Content $content) {
-            $content->header(trans('admin::lang.administrator'));
+            $title = Center::find($this->center) ? Center::find($this->center)->title : '' ;
+            $content->header(trans($title.' - 分中心管理界面'));
             $content->description(trans('admin::lang.list'));
             $content->body($this->grid()->render());
         });
     }
+
+    public function destroy($id)
+    {
+        $attr = ['user_id' => $id];
+        CenterUser::where($attr)->delete();
+        RoleUser::where($attr)->delete();
+        UserPermission::where($attr)->delete();
+
+        if ($this->form()->destroy($id)) {
+            return response()->json([
+                'status'  => true,
+                'message' => trans('admin::lang.delete_succeeded'),
+            ]);
+        } else {
+            return response()->json([
+                'status'  => false,
+                'message' => trans('admin::lang.delete_failed'),
+            ]);
+        }
+    }
+
 
     /**
      * Edit interface.
@@ -68,19 +102,22 @@ class UserController extends Controller
     protected function grid()
     {
         return Administrator::grid(function (Grid $grid) {
+
+            $grid->model()->from('admin_users as u')->join('admin_center_users as r', 'r.user_id', '=', 'u.id')
+                ->where('r.center_id', $this->center)->select('u.username', 'u.name', 'u.id')->orderBy('u.id', 'desc');
             $grid->id('ID')->sortable();
             $grid->username(trans('admin::lang.username'));
             $grid->name(trans('admin::lang.name'));
             $grid->roles(trans('admin::lang.roles'))->pluck('name')->label();
-            $grid->created_at(trans('admin::lang.created_at'));
-            $grid->updated_at(trans('admin::lang.updated_at'));
 
+//            $grid->model()->buildData();  //获得字段
             $grid->actions(function (Grid\Displayers\Actions $actions) {
-                if ($actions->getKey() == 1) {
+                if (Administrator::find($actions->getKey())->isRole('center-admin')) {
                     $actions->disableDelete();
+                    $actions->disableEdit();
                 }
             });
-
+            $grid->option('useRowSelector', false);
             $grid->tools(function (Grid\Tools $tools) {
                 $tools->batch(function (Grid\Tools\BatchActions $actions) {
                     $actions->disableDelete();
@@ -112,17 +149,23 @@ class UserController extends Controller
 
             $form->ignore(['password_confirmation']);
 
-            $form->multipleSelect('roles', trans('admin::lang.roles'))->options(Role::all()->pluck('name', 'id'));
-            $form->multipleSelect('permissions', trans('admin::lang.permissions'))->options(Permission::all()->pluck('name', 'id'));
-
-            $form->display('created_at', trans('admin::lang.created_at'));
-            $form->display('updated_at', trans('admin::lang.updated_at'));
-
             $form->saving(function (Form $form) {
                 if ($form->password && $form->model()->password != $form->password) {
                     $form->password = bcrypt($form->password);
                 }
             });
+            $form->saved(function (Form $form) {
+                $attr = ['center_id' => $this->center, 'user_id' => $form->model()->getKey()];
+                CenterUser::where($attr)->delete();
+                CenterUser::insert($attr);
+
+                $Researcher = Role::where('slug', 'Researcher')->value('id');
+                $attr1 = ['role_id' => $Researcher, 'user_id' => $form->model()->getKey()];
+                RoleUser::insert($attr1);
+
+            });
+
+
         });
     }
 }

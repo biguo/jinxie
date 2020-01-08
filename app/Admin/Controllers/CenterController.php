@@ -13,6 +13,8 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 
 class CenterController extends Controller
@@ -79,8 +81,8 @@ class CenterController extends Controller
     {
         return Admin::grid(Center::class, function (Grid $grid) {
 
-            $grid->model()->from('center as c')->leftJoin('admin_users as u', 'u.id', '=', 'c.admin_user_id')
-                ->select('c.id', 'c.title', 'c.status', 'u.name as username');
+//            $grid->model()->from('center as c')->leftJoin('admin_users as u', 'u.id', '=', 'c.admin_user_id')
+//                ->select('c.id', 'c.title', 'c.status', 'u.name as username');
 
 //            $grid->disableCreation();
             $grid->disableFilter();
@@ -88,7 +90,7 @@ class CenterController extends Controller
 //            $grid->disableActions();
             $grid->column('id', 'ID');
             $grid->column('title', '项目名')->editable();
-            $grid->column('username', '设置管理员');
+//            $grid->column('username', '设置管理员');
 
             $grid->status()->switch();
 
@@ -107,24 +109,27 @@ class CenterController extends Controller
             $form->display('id', 'ID');
             $form->text('slug', 'slug')->rules('required|min:3');
             $form->text('title', 'title')->rules('required|min:3');
-            $form->hidden('status');
+            $form->hidden('status')->default(0);
 
             $form->select('admin_user_id')->options(function () {
                 $array = Administrator::pluck('name', 'id')->toarray();
                 return ['0' => '请选择']+  $array;
             })->default(0);
-//            $form->html(new CheckRow());
-//            $form->saving(function (Form $form) {
+
+            $form->ignore(['admin_user_id']);
+
+            $form->saved(function (Form $form) {
+                $data = Input::all();
 
 
-//                $error = new MessageBag([
-//                    'title'   => 'Error',
-//                    'message' => '重点不是时间',
-//                ]);
-//                return back()->withInput()->with(compact('error'));
+//                if($data['admin_user_id'] ){
+//                    $attr = ['center_id' => $form->model()->getKey(), 'user_id' => $data['admin_user_id']];
+//                    CenterUser::where($attr)->delete();
+//                    CenterUser::insert($attr);
+//                }
 
-//            });
 
+            });
         });
     }
 }
