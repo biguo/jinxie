@@ -22,9 +22,29 @@ function responseErrorArr($message = '操作失败', $data = array(), $code = '5
     return ['report' => 'fail', 'code' => $code, 'data' => $data, 'msg' => $message, 'action' => 'ACTION_NONE'];
 }
 
-function getSql()
+/**
+ * 用于自定义Administrator的方法让超级管理员不再无条件看到每个菜单
+ * @param $roles
+ * @return mixed
+ */
+function visible($roles){
+    $id =  Illuminate\Support\Facades\Auth::guard('admin')->user()->id;
+    $admin = \App\Models\CustomerAdmin::find($id);
+    return $admin->visible($roles);
+}
+
+
+/**
+ * 用法如下 用于获得执行sql
+ *  getSql(function (){
+ *   DB::select('select * from admin_users limit 1');
+ *  });
+ * @param Closure $callback
+ */
+function getSql(\Closure $callback)
 {
     DB::enableQueryLog();
+    call_user_func($callback);
     print_r(DB::getQueryLog());
 }
 
@@ -49,7 +69,12 @@ function object_array($array)
 }
 
 /**
- *  这个比上面那个好用
+ * curl
+ * @param $url
+ * @param $requestString
+ * @param string $headertype
+ * @param int $timeout
+ * @return bool|string
  */
 function doCurlPostRequest($url, $requestString, $headertype = '', $timeout = 10)
 {
