@@ -5,6 +5,8 @@ namespace App\Admin\Controllers;
 
 use App\Admin\Extensions\CheckRow;
 use App\Models\Center;
+use App\Models\CenterUser;
+use App\Models\RoleUser;
 use Encore\Admin\Auth\Database\Administrator;
 use Encore\Admin\Auth\Database\Role;
 use Encore\Admin\Form;
@@ -111,24 +113,26 @@ class CenterController extends Controller
             $form->text('title', 'title')->rules('required|min:3');
             $form->hidden('status')->default(0);
 
-            $form->select('admin_user_id')->options(function () {
-                $array = Administrator::pluck('name', 'id')->toarray();
-                return ['0' => '请选择']+  $array;
-            })->default(0);
+
+            $administrator = Role::where('slug', 'administrator')->value('id');
+            $centerAdmin = Role::where('slug', 'center-admin')->value('id');
+
+            $array = Administrator::from('admin_users as a')->leftJoin('admin_role_users as r', 'a.id', '=', 'r.user_id')
+                ->whereRaw('(r.role_id != ? ) or (r.role_id is null)', [$administrator])->pluck('a.name', 'a.id')->toarray();
+
+
+            $form->select('admin_user_id')->options(function () use ($array) {
+                return ['0' => '请选择'] + $array;
+            })->default(function ($form) use ($centerAdmin) {
+                $user_id = CenterUser::where(['center_id' => $form->model()->getKey(), 'role_id' => $centerAdmin])->value('user_id');
+                return $user_id;
+            });
 
             $form->ignore(['admin_user_id']);
 
-            $form->saved(function (Form $form) {
+            $form->saved(function (Form $form) use ($centerAdmin) {
                 $data = Input::all();
-
-
-//                if($data['admin_user_id'] ){
-//                    $attr = ['center_id' => $form->model()->getKey(), 'user_id' => $data['admin_user_id']];
-//                    CenterUser::where($attr)->delete();
-//                    CenterUser::insert($attr);
-//                }
-
-
+                Center::saveCenterUser($form->model()->getKey(),$data['admin_user_id'],$centerAdmin);
             });
         });
     }

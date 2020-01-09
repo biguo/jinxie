@@ -12,29 +12,13 @@ class Center extends Model
 
     public $timestamps = false;
 
-    /**
-     * 根据参数搜索当前乡村项目
-     * @param null $slug
-     * @return mixed
-     */
-    public static function current($slug = null)
+    public static function saveCenterUser($center_id, $user_id, $role_id)
     {
-        if (!$slug) {
-            $slug = Input::get('slug');
-        }
-        return self::where('slug', $slug)->first();
-    }
-
-    public function banners()
-    {
-        return $this->hasMany(Banner::class);
-    }
-
-    public function usedBanner()
-    {
-        return $this->banners()->where('status', Status_Online)
-            ->select('id', 'title','subtitle','subtitle1','description', DB::raw("concat('" . Upload_Domain . "', image) as image"), DB::raw("concat('" . Upload_Domain . "', bigImage) as bigImage"),'sort')
-            ->orderBy('sort', 'asc')->get();
+        CenterUser::where(['center_id' => $center_id, 'user_id' => $user_id])->delete();
+        CenterUser::insert(['center_id' => $center_id, 'user_id' => $user_id, 'role_id' => $role_id] );
+        $attr1 = ['role_id' => $role_id, 'user_id' => $user_id];
+        RoleUser::where($attr1)->delete();
+        RoleUser::insert($attr1);
     }
 
 }
