@@ -11,7 +11,6 @@ Route::group([
 ], function (Router $router) {
 
     $router->get('/', 'HomeController@index');
-    $router->resource('auth/users', UserController::class);
     $router->resource('banner', BannerController::class);
     $router->resource('center', CenterController::class);
     $router->resource('center_user', CenterUserController::class);
