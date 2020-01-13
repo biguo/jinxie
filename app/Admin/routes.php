@@ -13,6 +13,16 @@ Route::group([
     $router->get('/', 'HomeController@index');
     $router->resource('banner', BannerController::class);
     $router->resource('center', CenterController::class);
+
+
+    $router->any('createAdmin/{id}', 'CenterController@createAdmin');
+    $router->any('setAdmin/{id}', 'CenterController@setAdmin');
+    $router->any('createAdmin', 'CenterController@backList');  // 用于面包屑
+
+//    $router->any('/center/createAdmin/{id}', 'CenterController@createAdmin');
+//    $router->any('/center/createAdmin/{id}', 'CenterController@createAdmin');
+
+
     $router->resource('center_user', CenterUserController::class);
 
 

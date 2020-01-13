@@ -43,26 +43,6 @@ class CenterUserController extends Controller
         });
     }
 
-    public function destroy($id)
-    {
-        $attr = ['user_id' => $id];
-        CenterUser::where($attr)->delete();
-        RoleUser::where($attr)->delete();
-
-        if ($this->form()->destroy($id)) {
-            return response()->json([
-                'status'  => true,
-                'message' => trans('admin::lang.delete_succeeded'),
-            ]);
-        } else {
-            return response()->json([
-                'status'  => false,
-                'message' => trans('admin::lang.delete_failed'),
-            ]);
-        }
-    }
-
-
     /**
      * Edit interface.
      *
@@ -111,7 +91,7 @@ class CenterUserController extends Controller
 
 //            $grid->model()->buildData();  //获得字段
             $grid->actions(function (Grid\Displayers\Actions $actions) {
-                if (Administrator::find($actions->getKey())->isRole('center-admin')) {
+                if (Administrator::find($actions->getKey())->inRoles([CENTER_ADMIN, BRANCH_ADMIN])) {
                     $actions->disableDelete();
                     $actions->disableEdit();
                 }
