@@ -84,11 +84,13 @@ class CenterController extends Controller
     protected function grid()
     {
         return Admin::grid(Center::class, function (Grid $grid) {
-
+            $centerRoleId = Role::where('slug', CENTER_ADMIN)->value('id');
+            $branchRoleId = Role::where('slug', BRANCH_ADMIN)->value('id');
             $grid->model()->from('center as c')
                 ->leftJoin('admin_center_users as r', 'r.center_id', '=', 'c.id')
                 ->leftJoin('admin_users as u', 'u.id', '=', 'r.user_id')
-                ->select('c.id', 'c.title', 'c.status', 'c.slug', 'u.name as username');
+                ->select('c.id', 'c.title', 'c.status', 'c.slug', 'u.name as username')
+                ->whereIn('r.role_id',[$centerRoleId,$branchRoleId ]);
 
 //            $grid->disableCreation();
             $grid->disableFilter();
@@ -107,18 +109,12 @@ class CenterController extends Controller
                     $actions->disableDelete();
                     $actions->disableEdit();
                     if ($isAdmin) {
-                        if ($actions->row->username === null) {
-                            $actions->append('<a href="' . admin_url('createAdmin/' . $actions->getKey()) . '" title="设置管理员"><i class="fa fa-user"></i></a>');
-                        } else {
-                            $actions->append('<a href="' . admin_url('chooseAdmin/' . $actions->getKey()) . '" title="更换管理员"><i class="fa fa-user"></i></a>');
-                        }
+                        $actions->append('<div class="btn-group left" style="margin-right: 10px"><a href="' . admin_url('createAdmin/' . $actions->getKey()) . '" class="btn btn-sm btn-success"><i class="fa fa-safari"></i>&nbsp;&nbsp;设置管理员</a></div>');
+                        $actions->append('<div class="btn-group left" style="margin-right: 10px"><a href="' . admin_url('chooseAdmin/' . $actions->getKey()) . '" class="btn btn-sm btn-primary"><i class="fa fa-user"></i>&nbsp;&nbsp;更换管理员</a></div>');
                     }
                 } else {
-                    if ($actions->row->username === null) {
-                        $actions->append('<a href="' . admin_url('createAdmin/' . $actions->getKey()) . '" title="设置管理员"><i class="fa fa-user"></i></a>');
-                    } else {
-                        $actions->append('<a href="' . admin_url('chooseAdmin/' . $actions->getKey()) . '" title="更换管理员"><i class="fa fa-user"></i></a>');
-                    }
+                    $actions->append('<div class="btn-group left" style="margin-right: 10px"><a href="' . admin_url('createAdmin/' . $actions->getKey()) . '" class="btn btn-sm btn-success"><i class="fa fa-safari"></i>&nbsp;&nbsp;设置管理员</a></div>');
+                    $actions->append('<div class="btn-group left" style="margin-right: 10px"><a href="' . admin_url('chooseAdmin/' . $actions->getKey()) . '" class="btn btn-sm btn-primary"><i class="fa fa-user"></i>&nbsp;&nbsp;更换管理员</a></div>');
                 }
             });
 
@@ -166,10 +162,7 @@ class CenterController extends Controller
         $attr = array_only($params, ['user_id', 'role_id']);
         if (!empty($attr)) {
             DB::transaction(function () use ($attr, $id) {
-                CenterUser::where(['center_id' => $id, 'role_id' => $attr['role_id']])->delete();
-                CenterUser::insert(['center_id' => $id, 'user_id' => $attr['user_id'], 'role_id' => $attr['role_id']]);
-                RoleUser::where(['user_id' => $attr['user_id']])->delete();
-                RoleUser::insert(['role_id' => $attr['role_id'], 'user_id' => $attr['user_id']]);
+                Center::saveCenterManagr($id, $attr['user_id'], $attr['role_id']);
             });
             admin_toastr(trans('admin::lang.save_succeeded'));
         }
@@ -186,14 +179,21 @@ class CenterController extends Controller
     {
         return Admin::form(CenterUser::class, function (Form $form) use ($id) {
             $center = Center::find($id);
-            $roleSlug = ($center->slug = GLOBAL_CENTER) ? CENTER_ADMIN : BRANCH_ADMIN;
-            $roleId = Role::where('slug', $roleSlug)->value('id');
-            $centerUser = CenterUser::where([['center_id', $id], ['role_id', $roleId]])->first();
+            $centerRoleId = Role::where('slug', CENTER_ADMIN)->value('id');
+            $branchRoleId = Role::where('slug', BRANCH_ADMIN)->value('id');
+            $roleId = ($center->slug === GLOBAL_CENTER) ? $centerRoleId : $branchRoleId;
+            $centerUser = CenterUser::from('admin_center_users as cu') ->leftJoin('admin_users as u', 'u.id', '=', 'cu.user_id')
+                ->where([['cu.center_id', $id], ['cu.role_id', $roleId]])->pluck('u.name', 'u.id')->toarray();
+            $default = $centerUser ? $centerUser : [];
+            $array = Administrator::from('admin_users as u')
+                ->leftJoin('admin_role_users as ru', 'u.id', '=', 'ru.user_id')
+                ->leftJoin('admin_center_users as cu', 'cu.user_id', '=', 'u.id')
+                ->whereIn('ru.role_id', [$centerRoleId, $branchRoleId])
+                ->where('cu.center_id', null)
+                ->pluck('u.name', 'u.id')->toarray();
+            $array = $default + $array;
 
-            $form->select('user_id', '选择管理员')->options(function () {
-                $array = Administrator::pluck('name', 'id')->toarray();
-                return $array;
-            })->default($centerUser->user_id);
+            $form->select('user_id', '选择管理员')->options($array);
             $form->hidden('role_id')->default($roleId);
             $form->setAction(admin_url('chosenAdmin/' . $id));
         });
@@ -235,8 +235,12 @@ class CenterController extends Controller
 
             DB::transaction(function () use ($attr, $id) {
                 $user = CustomerAdmin::create($attr);
-                $role_id = Role::where('slug', CENTER_ADMIN)->value('id');
-                Center::saveCenterUser($id, $user->id, $role_id);
+                $center = Center::find($id);
+                $centerRoleId = Role::where('slug', CENTER_ADMIN)->value('id');
+                $branchRoleId = Role::where('slug', BRANCH_ADMIN)->value('id');
+                $roleId = ($center->slug === GLOBAL_CENTER) ? $centerRoleId : $branchRoleId;
+                Center::saveCenterManagr($id,$user->id,$roleId);
+
             });
             admin_toastr(trans('admin::lang.save_succeeded'));
         }
