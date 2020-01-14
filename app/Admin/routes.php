@@ -15,9 +15,14 @@ Route::group([
     $router->resource('center', CenterController::class);
 
 
-    $router->any('createAdmin/{id}', 'CenterController@createAdmin');
+    $router->any('createAdmin/{id}', 'CenterController@createAdmin');   //设置中心分中心管理员
     $router->any('setAdmin/{id}', 'CenterController@setAdmin');
     $router->any('createAdmin', 'CenterController@backList');  // 用于面包屑
+
+    $router->any('chooseAdmin/{id}', 'CenterController@chooseAdmin');  // 更换中心/分中心管理员
+    $router->any('chosenAdmin/{id}', 'CenterController@chosenAdmin');
+    $router->any('chooseAdmin', 'CenterController@backList');  // 用于面包屑
+
 
 //    $router->any('/center/createAdmin/{id}', 'CenterController@createAdmin');
 //    $router->any('/center/createAdmin/{id}', 'CenterController@createAdmin');
