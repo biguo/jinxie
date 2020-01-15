@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\File;
+use App\Models\Project;
 
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -11,7 +11,7 @@ use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
 
-class FileController extends Controller
+class ProjectControllers extends Controller
 {
     use ModelForm;
 
@@ -24,7 +24,7 @@ class FileController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('资料库');
+            $content->header('header');
             $content->description('description');
 
             $content->body($this->grid());
@@ -41,7 +41,7 @@ class FileController extends Controller
     {
         return Admin::content(function (Content $content) use ($id) {
 
-            $content->header('资料库');
+            $content->header('header');
             $content->description('description');
 
             $content->body($this->form()->edit($id));
@@ -57,7 +57,7 @@ class FileController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('资料库');
+            $content->header('header');
             $content->description('description');
 
             $content->body($this->form());
@@ -71,13 +71,10 @@ class FileController extends Controller
      */
     protected function grid()
     {
-        return Admin::grid(File::class, function (Grid $grid) {
-            $grid->model()->where('mid', $this->mid)->orderBy('id', 'desc');
+        return Admin::grid(Project::class, function (Grid $grid) {
+
             $grid->id('ID')->sortable();
-            $grid->column('title', '标题')->editable();
-            $grid->path('路径')->display(function ($path) {
-                return '<a href="'.Upload_Domain.$path.'" target="_blank">'.$path.'</a>';
-            });
+
             $grid->created_at();
             $grid->updated_at();
         });
@@ -90,13 +87,10 @@ class FileController extends Controller
      */
     protected function form()
     {
-        return Admin::form(File::class, function (Form $form) {
+        return Admin::form(Project::class, function (Form $form) {
 
             $form->display('id', 'ID');
-            $form->text('title', 'title')->rules('required|min:3');
-            $form->file('path', 'path');
-            $form->hidden('center_id' )->default($this->center);
-            $form->hidden('mid')->default($this->mid);
+
             $form->display('created_at', 'Created At');
             $form->display('updated_at', 'Updated At');
         });

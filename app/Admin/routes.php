@@ -23,12 +23,9 @@ Route::group([
     $router->any('chosenAdmin/{id}', 'CenterController@chosenAdmin');
     $router->any('chooseAdmin', 'CenterController@backList');  // 用于面包屑
 
-
-//    $router->any('/center/createAdmin/{id}', 'CenterController@createAdmin');
-//    $router->any('/center/createAdmin/{id}', 'CenterController@createAdmin');
-
-
     $router->resource('center_user', CenterUserController::class);
+    $router->resource('files', FileController::class);
+    $router->resource('project', ProjectControllers::class);
 
 
 });
