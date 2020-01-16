@@ -2,9 +2,11 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Extensions\LittleTip;
 use App\Http\Controllers\Controller;
 use App\Models\CenterUser;
 use App\Models\Project;
+use Encore\Admin\Auth\Database\Administrator;
 use Encore\Admin\Controllers\ModelForm;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
@@ -81,7 +83,9 @@ class ProjectControllers extends Controller
             $grid->disableRowSelector();
             $grid->tools(function (Grid\Tools $tools) {
                 $tools->disableRefreshButton();
+                $tools->append(new LittleTip('未分配的'));
             });
+
 
             $grid->id('#');
             $grid->column('title','主题')->display(function ($title) {
@@ -91,6 +95,10 @@ class ProjectControllers extends Controller
                 $arr = ['0' => '无', '1' => '低', '2' => '中', '3' => '高', '4' => '紧急', '5' => '非常紧急'];
                 return $arr[$priority];
             });
+            $grid->column('to', '指派给')->display(function ($to) {
+                return ($to === 0) ? '-' : Administrator::find($to)->name;
+            });
+
             $grid->column('percent', '完成百分比')->progressBar1();
             $grid->updated_at('最后更新于');
             $grid->created_at('报告日期');
