@@ -24,7 +24,8 @@ class Controller extends BaseController
     {
         $this->request = $request;
         $this->mid = Auth::guard('admin')->user()->id;
-        $this->center = CenterUser::where('user_id', $this->mid)->value('center_id');
+        $cu = CenterUser::where('user_id', $this->mid)->value('center_id');
+        $this->center =  $cu ? $cu : Center::where('slug', GLOBAL_CENTER)->value('id');
     }
 
 }

@@ -19,8 +19,13 @@
  */
 use App\Admin\Extensions\Form\CKEditor;
 use Encore\Admin\Form;
+use Encore\Admin\Grid\Column;
 
 Encore\Admin\Form::forget(['map', 'editor']);
 Form::extend('ckeditor', CKEditor::class);
 
+Column::extend('progressBar1', \App\Admin\Extensions\CustomerProgressBar::class);
+
 app('view')->prependNamespace('admin', resource_path('views/admin'));
+
+

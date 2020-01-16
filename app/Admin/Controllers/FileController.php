@@ -94,7 +94,7 @@ class FileController extends Controller
 
             $form->display('id', 'ID');
             $form->text('title', 'title')->rules('required|min:3');
-            $form->file('path', 'path');
+            $form->file('path', 'path')->rules('required');
             $form->hidden('center_id' )->default($this->center);
             $form->hidden('mid')->default($this->mid);
             $form->display('created_at', 'Created At');
