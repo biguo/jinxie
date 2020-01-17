@@ -146,7 +146,7 @@ class ProjectControllers extends Controller
 
             $form->display('id', 'ID');
             $form->text('title')->rules('required');
-            $form->ckeditor('description')->rules('required');
+            $form->textarea('description')->rules('required');
 
             $options = CenterUser::from('admin_center_users as r')
                 ->leftJoin('admin_users as u', 'u.id', '=', 'r.user_id')
