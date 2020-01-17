@@ -30,8 +30,9 @@ class ProjectControllers extends Controller
             $content->description('description');
 
             $content->body($this->grid());
-            $content->body($this->grid());
-            $content->body($this->grid());
+            $content->body($this->grid('1'));
+            $content->body($this->grid('2'));
+            $content->body($this->grid('3'));
         });
     }
 
@@ -73,25 +74,54 @@ class ProjectControllers extends Controller
      *
      * @return Grid
      */
-    protected function grid()
+    protected function grid($scenario = '')
     {
-        return Admin::grid(Project::class, function (Grid $grid) {
-            $grid->disableCreation();
+        return Admin::grid(Project::class, function (Grid $grid) use ($scenario) {
+
+
+            if ($scenario === '') {           #第一个
+                $grid->model()->where('center_id', $this->center)->where('to', 0);
+                $grid->tools(function (Grid\Tools $tools) {
+
+                    $tools->disableRefreshButton();
+                    $tools->append(new LittleTip('未分配的'));
+                });
+                $grid->model()->where('to', 0);
+            } elseif ($scenario === '1') {
+                $grid->disableCreation();
+                $grid->model()->where('center_id', $this->center)->where('to', $this->mid);
+                $grid->tools(function (Grid\Tools $tools) {
+                    $tools->disableRefreshButton();
+                    $tools->append(new LittleTip('指派给我的'));
+                });
+            } elseif ($scenario === '2') {
+                $grid->disableCreation();
+                $grid->model()->where('center_id', $this->center)->where('from', $this->mid);
+                $grid->tools(function (Grid\Tools $tools) {
+                    $tools->disableRefreshButton();
+                    $tools->append(new LittleTip('我报告的'));
+                });
+            } elseif ($scenario === '3') {
+                $grid->disableCreation();
+                $grid->model()->where('center_id', $this->center)->where('from', $this->mid);
+                $grid->tools(function (Grid\Tools $tools) {
+                    $tools->disableRefreshButton();
+                    $tools->append(new LittleTip('已完成的'));
+                });
+            }
+
+
             $grid->disablePagination();
             $grid->disableFilter();
             $grid->disableExport();
             $grid->disableRowSelector();
-            $grid->tools(function (Grid\Tools $tools) {
-                $tools->disableRefreshButton();
-                $tools->append(new LittleTip('未分配的'));
-            });
 
 
             $grid->id('#');
-            $grid->column('title','主题')->display(function ($title) {
-                return "<a href='".admin_url('project/' . $this->id.'/edit')."'>$title</a>";
+            $grid->column('title', '主题')->display(function ($title) {
+                return "<a href='" . admin_url('project/' . $this->id . '/edit') . "'>$title</a>";
             });
-            $grid->column('priority','优先级')->display(function ($priority) {
+            $grid->column('priority', '优先级')->display(function ($priority) {
                 $arr = ['0' => '无', '1' => '低', '2' => '中', '3' => '高', '4' => '紧急', '5' => '非常紧急'];
                 return $arr[$priority];
             });
@@ -132,8 +162,9 @@ class ProjectControllers extends Controller
             $form->date('begin_date', '开始日期');
             $form->date('end_date', '计划完成日期');
 
-            $form->select('percent', '完成百分比')->options(['0' => '0%', '10' => '10%', '20' => '20%', '30' => '30%', '40' => '40%', '50' => '50%', '6' => '60%', '7' => '70%', '8' => '80%', '9' => '90%', '10' => '100%']);
+            $form->select('percent', '完成百分比')->options(['0' => '0%', '10' => '10%', '20' => '20%', '30' => '30%', '40' => '40%', '50' => '50%', '60' => '60%', '70' => '70%', '80' => '80%', '90' => '90%', '100' => '100%']);
             $form->hidden('from')->value($this->mid);
+            $form->hidden('center_id')->value($this->center);
             $form->hidden('status')->value(0);
             $form->display('created_at', 'Created At');
             $form->display('updated_at', 'Updated At');
