@@ -6,12 +6,14 @@ use App\Admin\Extensions\LittleTip;
 use App\Http\Controllers\Controller;
 use App\Models\CenterUser;
 use App\Models\Project;
+use App\Models\ProjectRecord;
 use Encore\Admin\Auth\Database\Administrator;
 use Encore\Admin\Controllers\ModelForm;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\URL;
 
 class ProjectControllers extends Controller
 {
@@ -46,10 +48,13 @@ class ProjectControllers extends Controller
     {
         return Admin::content(function (Content $content) use ($id) {
 
-            $content->header('header');
-            $content->description('description');
+            $content->header('研究任务');
+            $content->description('编辑');
 
-            $content->body($this->form()->edit($id));
+            $form = $this->form();
+            $form->builder()->addHiddenField((new Form\Field\Hidden(Form\Builder::PREVIOUS_URL_KEY))->value(URL::current()));  // 原地更新
+            $content->row($form->edit($id));
+            $content->row($this->recordGird($id));
         });
     }
 
@@ -66,6 +71,27 @@ class ProjectControllers extends Controller
             $content->description('description');
 
             $content->body($this->form());
+        });
+    }
+
+    protected function recordGird($project_id)
+    {
+        return Admin::grid(ProjectRecord::class, function (Grid $grid) use ($project_id) {
+
+            $grid->disableCreation();
+            $grid->model()->where('project_id', $project_id)->orderBy('id', 'desc');
+            $grid->tools(function (Grid\Tools $tools) {
+                $tools->disableRefreshButton();
+                $tools->append(new LittleTip('变动记录'));
+            });
+            $grid->disablePagination();
+            $grid->disableFilter();
+            $grid->disableExport();
+            $grid->disableRowSelector();
+            $grid->disableActions();
+            $grid->column('description', ' ')->display(function ($description) {
+                return '由 '.$this->name.' 更新于 '.$this->updated_at.': &nbsp;&nbsp;' . $description;
+            });
         });
     }
 
@@ -144,7 +170,6 @@ class ProjectControllers extends Controller
     {
         return Admin::form(Project::class, function (Form $form) {
 
-            $form->display('id', 'ID');
             $form->text('title')->rules('required');
             $form->textarea('description')->rules('required');
 
@@ -166,8 +191,6 @@ class ProjectControllers extends Controller
             $form->hidden('from')->value($this->mid);
             $form->hidden('center_id')->value($this->center);
             $form->hidden('status')->value(0);
-            $form->display('created_at', 'Created At');
-            $form->display('updated_at', 'Updated At');
         });
     }
 }

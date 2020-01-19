@@ -8,5 +8,5 @@ class ProjectRecord extends Model
 {
     protected $table = 'project_record';
 
-    protected $fillable = ['json', 'mid', 'center_id', 'description', 'name'];
+    protected $fillable = ['json', 'mid', 'center_id', 'project_id', 'description', 'name'];
 }

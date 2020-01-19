@@ -57,27 +57,15 @@ class ProjectObserver
             $attr['name'] = $user->name;
             $cu = CenterUser::where('user_id', $user->id)->value('center_id');
             $attr['center_id'] = $cu ? $cu : Center::where('slug', GLOBAL_CENTER)->value('id');
-
+            $attr['project_id'] = $project->id ;
             $str = '';
-            $arr = [
-                'priority' => '优先级',
-                'category' => '种类',
-                'to' => '发送给',
-                'begin_date' => '开始日期',
-                'end_date' => '计划完成日期',
-                'title' => '标题',
-                'description' => '描述',
-                'percent' => '完成百分比'
-            ];
+            $arr = ['priority' => '优先级','category' => '种类','to' => '发送给','begin_date' => '开始日期','end_date' => '计划完成日期','title' => '标题','description' => '描述','percent' => '完成百分比'];
             foreach ($diff1 as $key => $value) {
                 $str .= $arr[$key] . '从' . $value . '变更为' . $diff2[$key] . '; ';
             }
             $attr['description'] = $str;
             ProjectRecord::create($attr);
-
         }
-
-
     }
 
     /**
