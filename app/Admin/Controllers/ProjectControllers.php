@@ -13,6 +13,7 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 
 class ProjectControllers extends Controller
@@ -158,6 +159,20 @@ class ProjectControllers extends Controller
             $grid->column('percent', '完成百分比')->progressBar1();
             $grid->updated_at('最后更新于');
             $grid->created_at('报告日期');
+            $user = Auth::guard('admin')->user();
+
+            $grid->actions(function (Grid\Displayers\Actions $actions) use ($user) {
+
+                    if($actions->row->from === $user->id){
+
+                    }elseif ($actions->row->to === $user->id){
+                        $actions->disableDelete();
+                    }else{
+                        $actions->disableDelete();
+                        $actions->disableEdit();
+                    }
+
+            });
         });
     }
 
@@ -171,7 +186,7 @@ class ProjectControllers extends Controller
         return Admin::form(Project::class, function (Form $form) {
 
             $form->text('title')->rules('required');
-            $form->textarea('description')->rules('required');
+            $form->textarea('description');
 
             $options = CenterUser::from('admin_center_users as r')
                 ->leftJoin('admin_users as u', 'u.id', '=', 'r.user_id')
@@ -184,8 +199,8 @@ class ProjectControllers extends Controller
             $form->select('priority', '优先级')->options(['0' => '无', '1' => '低', '2' => '中', '3' => '高', '4' => '紧急', '5' => '非常紧急']);
             $form->select('category', '种类')->options(['0' => '-']);
 
-            $form->date('begin_date', '开始日期');
-            $form->date('end_date', '计划完成日期');
+            $form->date('begin_date', '开始日期')->rules('required');
+            $form->date('end_date', '计划完成日期')->rules('required');
 
             $form->select('percent', '完成百分比')->options(['0' => '0%', '10' => '10%', '20' => '20%', '30' => '30%', '40' => '40%', '50' => '50%', '60' => '60%', '70' => '70%', '80' => '80%', '90' => '90%', '100' => '100%']);
             $form->hidden('from')->value($this->mid);
@@ -194,3 +209,4 @@ class ProjectControllers extends Controller
         });
     }
 }
+
