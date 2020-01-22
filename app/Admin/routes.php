@@ -26,6 +26,8 @@ Route::group([
     $router->resource('center_user', CenterUserController::class);
     $router->resource('files', FileController::class);
     $router->resource('project', ProjectControllers::class);
+    $router->resource('article', ArticleController::class);
+    $router->resource('category', CategoryController::class);
 
 
 });
