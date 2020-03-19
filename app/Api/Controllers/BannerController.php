@@ -2,17 +2,15 @@
 
 namespace App\Api\Controllers;
 
-use App\Models\Country;
-
+use App\Models\Banner;
 
 class BannerController extends BaseController
 {
 
     public function getList()
     {
-        if(Country::current())
-                return responseSuccess(Country::current()->usedBanner());
-        return responseError('非法请求');
+        $banners = Banner::where(['status' => Status_Online])->get();
+        return responseSuccess($banners);
     }
 
 

@@ -52,5 +52,7 @@ class Kernel extends HttpKernel
         'jwt.auth' => \Tymon\JWTAuth\Http\Middleware\Authenticate::class,
         'jwt.refresh' => \Tymon\JWTAuth\Http\Middleware\RefreshToken::class,
         'refreshtoken' => \App\Http\Middleware\RefreshToken::class,
+        //允许vue使用
+        'vue' => \App\Http\Middleware\Vue::class,
     ];
 }

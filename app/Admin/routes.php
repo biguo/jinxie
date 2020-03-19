@@ -14,6 +14,7 @@ Route::group([
     $router->resource('banner', BannerController::class);
     $router->resource('center', CenterController::class);
 
+    $router->resource('auth/users', 'UserController');
 
     $router->any('createAdmin/{id}', 'CenterController@createAdmin');   //设置中心分中心管理员
     $router->any('setAdmin/{id}', 'CenterController@setAdmin');

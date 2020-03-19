@@ -2,15 +2,14 @@
 
 namespace App\Admin\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\Article;
-
 use App\Models\Category;
+use Encore\Admin\Controllers\ModelForm;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Controllers\ModelForm;
 
 class ArticleController extends Controller
 {
@@ -75,17 +74,19 @@ class ArticleController extends Controller
         return Admin::grid(Article::class, function (Grid $grid) {
             $grid->model()->from('article as a')
                 ->join('category as c', 'c.id', '=', 'a.type_id')
-                ->select('a.*','c.name');
+                ->join('center as ce', 'ce.id', '=', 'a.center_id')
+                ->select('a.*', 'c.name', 'ce.title as ct');
 
             $grid->id('ID')->sortable();
             $grid->title()->editable();
             $grid->content()->editable();
-            $grid->name();
+            $grid->column('ct', 'Belong');
+            $grid->column('name', 'category');
             $grid->image()->image(Upload_Domain, 100, 100);
             $grid->status()->switch();
             $grid->sort()->editable();
-            $grid->created_at();
-            $grid->updated_at();
+//            $grid->created_at();
+//            $grid->updated_at();
             $grid->filter(function ($filter) {
 //                $filter->useModal();
                 $filter->disableIdFilter();
