@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Article;
 use App\Models\Category;
+use App\Models\Center;
 use Encore\Admin\Controllers\ModelForm;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
@@ -71,10 +72,12 @@ class ArticleController extends Controller
      */
     protected function grid()
     {
+
         return Admin::grid(Article::class, function (Grid $grid) {
             $grid->model()->from('article as a')
                 ->join('category as c', 'c.id', '=', 'a.type_id')
                 ->join('center as ce', 'ce.id', '=', 'a.center_id')
+                ->where('center_id', $this->center)
                 ->select('a.*', 'c.name', 'ce.title as ct');
 
             $grid->id('ID')->sortable();
@@ -115,8 +118,9 @@ class ArticleController extends Controller
             $form->text('title', 'title')->rules('required|min:3');
             $form->ckeditor('content', 'content');
             $form->image('image', 'image');
-            $array = Category::pluck('name', 'id')->toarray();
-
+            if($this->center !=  Center::where('slug', GLOBAL_CENTER)->value('id')){
+                $array = Category::whereIn('id',['6','8'])->pluck('name', 'id')->toarray();
+            }
             $form->select('type_id', '类型')->options(['' => '请选择'] + $array)->rules('required');
             $form->hidden('center_id')->value($this->center);
             $form->hidden('mid')->value($this->mid);
