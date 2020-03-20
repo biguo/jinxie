@@ -83,8 +83,9 @@ class BannerController extends Controller
             $grid->model()->where('center_id', $this->center)->orderBy('status', 'desc')->orderBy('sort')->orderBy('id', 'desc');
             $grid->disableExport();
             $grid->id('ID')->sortable();
-            $grid->title()->editable();
-            $grid->description()->editable();
+            $grid->column('title')->display(function ($title){
+                return "<div style='width:590px'>$title</div>";
+            });
             $grid->image()->image(Upload_Domain, 100, 100);
             $grid->created_at();
             $grid->filter(function ($filter) {
@@ -109,7 +110,7 @@ class BannerController extends Controller
 
             $form->display('id', 'ID');
             $form->text('title', 'title')->rules('required|min:3');
-            $form->text('description', 'description')->rules('required|min:3');
+            $form->ckeditor('description', 'description')->rules('required|min:3');
             $form->image('image', 'image');
             $form->text('center_id')->value($this->center);
             $form->hidden('sort');

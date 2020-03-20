@@ -90,7 +90,7 @@ class CenterController extends Controller
                 ->leftJoin('admin_center_users as r', 'r.center_id', '=', 'c.id')
                 ->leftJoin('admin_users as u', 'u.id', '=', 'r.user_id')
                 ->select('c.id', 'c.title', 'c.status', 'c.slug', 'u.name as username')
-                ->whereIn('r.role_id',[$centerRoleId,$branchRoleId ]);
+                ->groupBy('c.id');
 
 //            $grid->disableCreation();
             $grid->disableFilter();
