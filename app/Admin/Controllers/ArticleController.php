@@ -115,11 +115,12 @@ class ArticleController extends Controller
         return Admin::form(Article::class, function (Form $form) {
 
             $form->display('id', 'ID');
-            $form->text('title', 'title')->rules('required|min:3');
+            $form->textarea('title', 'title')->rules('required|min:3');
             $form->ckeditor('content', 'content');
             $form->image('image', 'image');
+            $array = Category::pluck('name', 'id')->toarray();
             if($this->center !=  Center::where('slug', GLOBAL_CENTER)->value('id')){
-                $array = Category::whereIn('id',['6','8'])->pluck('name', 'id')->toarray();
+                $array = Category::whereIn('id',['6','7'])->pluck('name', 'id')->toarray();
             }
             $form->select('type_id', '类型')->options(['' => '请选择'] + $array)->rules('required');
             $form->hidden('center_id')->value($this->center);

@@ -26,6 +26,9 @@ class ArticleController extends BaseController
             }
         }
         $data = Article::where($where)->paginate($perPage, ['*'], 'page', $page);
+        foreach ($data as $item){
+            $item['content'] = str_replace(array("\r\n", "\r", "\n", "&nbsp;"), "", strip_tags(htmlspecialchars_decode($item['content'])));
+        }
         return responseSuccess($data);
     }
 
