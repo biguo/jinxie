@@ -32,4 +32,10 @@ class ArticleController extends BaseController
         return responseSuccess($data);
     }
 
+    public function getCenters()
+    {
+        $centers = Center::where([['slug','!=', GLOBAL_CENTER]])->get();
+        return responseSuccess($centers);
+    }
+
 }
