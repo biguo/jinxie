@@ -25,10 +25,11 @@ Route::group([
     $router->any('chooseAdmin', 'CenterController@backList');  // 用于面包屑
 
     $router->resource('center_user', CenterUserController::class);
-    $router->resource('files', FileController::class);
+    $router->resource('files', FileController::class);          //附件
     $router->resource('project', ProjectControllers::class);
     $router->resource('article', ArticleController::class);
-    $router->resource('category', CategoryController::class);
+    $router->resource('category', CategoryController::class); //文章自定义类型
+    $router->resource('types', FileTypeController::class); //附件自定义类型
 
 
 });

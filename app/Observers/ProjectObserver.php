@@ -107,8 +107,8 @@ class ProjectObserver
                 ProjectRecord::create($toAttr);
             }
 
-            $diff1_ = array_except($diff1, ['to']);
-            $diff2_ = array_except($diff2, ['to']);
+            $diff1_ = array_except($diff1, ['to','status']);
+            $diff2_ = array_except($diff2, ['to','status']);
 
 
             if ($diff1_ || $diff2_) {

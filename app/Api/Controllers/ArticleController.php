@@ -34,7 +34,12 @@ class ArticleController extends BaseController
 
     public function getCenters()
     {
-        $centers = Center::where([['slug','!=', GLOBAL_CENTER]])->get();
+        $params = Input::all();
+        $query = Center::where([['slug','!=', GLOBAL_CENTER]]);
+        if(isset($params['size'])){
+            $query->limit($params['size']);
+        }
+        $centers = $query->get();
         return responseSuccess($centers);
     }
 

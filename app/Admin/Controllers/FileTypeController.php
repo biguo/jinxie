@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Category;
+use App\Models\FileType;
 
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -11,7 +11,7 @@ use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
 
-class CategoryController extends Controller
+class FileTypeController extends Controller
 {
     use ModelForm;
 
@@ -24,7 +24,7 @@ class CategoryController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('文章类型');
+            $content->header('文件类型');
             $content->description('description');
 
             $content->body($this->grid());
@@ -41,7 +41,7 @@ class CategoryController extends Controller
     {
         return Admin::content(function (Content $content) use ($id) {
 
-            $content->header('文章类型');
+            $content->header('文件类型');
             $content->description('description');
 
             $content->body($this->form()->edit($id));
@@ -57,7 +57,7 @@ class CategoryController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('文章类型');
+            $content->header('文件类型');
             $content->description('description');
 
             $content->body($this->form());
@@ -71,11 +71,11 @@ class CategoryController extends Controller
      */
     protected function grid()
     {
-        return Admin::grid(Category::class, function (Grid $grid) {
+        return Admin::grid(FileType::class, function (Grid $grid) {
 
             $grid->id('ID')->sortable();
             $grid->name()->editable();
-            $grid->info()->editable();
+            $grid->disableExport();
         });
     }
 
@@ -86,7 +86,7 @@ class CategoryController extends Controller
      */
     protected function form()
     {
-        return Admin::form(Category::class, function (Form $form) {
+        return Admin::form(FileType::class, function (Form $form) {
 
             $form->display('id', 'ID');
             $form->text('name')->rules('required|min:3');

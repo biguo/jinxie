@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\FileType;
 use App\Models\Project;
+use App\Observers\FileTypeObserver;
 use App\Observers\ProjectObserver;
 use App\Observers\UserObserver;
 use Encore\Admin\Auth\Database\Administrator;
@@ -20,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
         // 为 User 模型注册观察者
         Administrator::observe(UserObserver::class);
         Project::observe(ProjectObserver::class);
+        FileType::observe(FileTypeObserver::class);
     }
 
     /**

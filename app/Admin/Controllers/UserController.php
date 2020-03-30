@@ -73,12 +73,12 @@ class UserController extends Controller
             $grid->model()->from('admin_users as u')
                 ->Leftjoin('admin_center_users as r', 'r.user_id', '=', 'u.id')
                 ->Leftjoin('center as c', 'r.center_id', '=', 'c.id')
-                ->select('u.*', 'c.title')->orderBy('u.id');
+                ->select('u.*', 'c.center_name')->orderBy('u.id');
 
             $grid->id('ID')->sortable();
             $grid->username(trans('admin::lang.username'));
             $grid->title()->display(function ($title){
-                return ($title)? $title: Center::where('slug', GLOBAL_CENTER)->value('title');
+                return ($title)? $title: Center::where('slug', GLOBAL_CENTER)->value('center_name');
             });
             $grid->name(trans('admin::lang.name'));
             $grid->roles(trans('admin::lang.roles'))->pluck('name')->label();

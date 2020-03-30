@@ -89,7 +89,7 @@ class CenterController extends Controller
             $grid->model()->from('center as c')
                 ->leftJoin('admin_center_users as r', 'r.center_id', '=', 'c.id')
                 ->leftJoin('admin_users as u', 'u.id', '=', 'r.user_id')
-                ->select('c.id', 'c.title', 'c.status', 'c.slug', 'u.name as username')
+                ->select('c.id', 'c.center_name', 'c.status', 'c.slug', 'u.name as username')
                 ->groupBy('c.id');
 
 //            $grid->disableCreation();
@@ -97,7 +97,7 @@ class CenterController extends Controller
             $grid->disableRowSelector();
 //            $grid->disableActions();
             $grid->column('id', 'ID');
-            $grid->column('title', '项目名')->editable();
+            $grid->column('center_name', '中心名')->editable();
             $grid->column('username', '设置管理员')->display(function () {
                 return $this->username ? $this->username : '暂无';
             });

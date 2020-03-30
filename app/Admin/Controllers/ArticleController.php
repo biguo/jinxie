@@ -11,6 +11,7 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\Input;
 
 class ArticleController extends Controller
 {
@@ -24,8 +25,11 @@ class ArticleController extends Controller
     public function index()
     {
         return Admin::content(function (Content $content) {
-
-            $content->header('文章');
+            $params = Input::all();
+            if(isset($params['type_id'])){
+                $category = Category::find($params['type_id']);
+            }
+            $content->header(isset($category)? $category->name : '文章列表');
             $content->description('description');
 
             $content->body($this->grid());
@@ -78,11 +82,12 @@ class ArticleController extends Controller
                 ->join('category as c', 'c.id', '=', 'a.type_id')
                 ->join('center as ce', 'ce.id', '=', 'a.center_id')
                 ->where('center_id', $this->center)
-                ->select('a.*', 'c.name', 'ce.title as ct');
+                ->select('a.title as at','a.image', 'a.status', 'a.sort','a.id','c.name', 'ce.center_name as ct');
 
             $grid->id('ID')->sortable();
-            $grid->title()->editable();
-            $grid->content()->editable();
+            $grid->column('at','title')->display(function ($title){
+                return "<div style='width:590px'>$title</div>";
+            });
             $grid->column('ct', 'Belong');
             $grid->column('name', 'category');
             $grid->image()->image(Upload_Domain, 100, 100);
@@ -119,9 +124,6 @@ class ArticleController extends Controller
             $form->ckeditor('content', 'content');
             $form->image('image', 'image');
             $array = Category::pluck('name', 'id')->toarray();
-            if($this->center !=  Center::where('slug', GLOBAL_CENTER)->value('id')){
-                $array = Category::whereIn('id',['8'])->pluck('name', 'id')->toarray();
-            }
             $form->select('type_id', '类型')->options(['' => '请选择'] + $array)->rules('required');
             $form->hidden('center_id')->value($this->center);
             $form->hidden('mid')->value($this->mid);
