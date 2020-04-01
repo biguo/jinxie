@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\FileType;
+use App\Models\Mail;
 use App\Models\Project;
 use App\Observers\FileTypeObserver;
 use App\Observers\ProjectObserver;
@@ -23,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
         Administrator::observe(UserObserver::class);
         Project::observe(ProjectObserver::class);
         FileType::observe(FileTypeObserver::class);
+        Mail::observe(MailObserver::class);
     }
 
     /**

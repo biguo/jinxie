@@ -7,8 +7,11 @@ use Encore\Admin\Admin;
 class CheckRow
 {
 
-    public function __construct()
+    protected $id;
+
+    public function __construct($id)
     {
+        $this->id = $id;
     }
 
     protected function script()
@@ -16,22 +19,10 @@ class CheckRow
 
         return <<<SCRIPT
 
-$('.grid-check-row').on('change', function () {
+$('.fa-arrow-left').on('click', function () {
 
     // Your code.
-    let id = $(this).val();
-    let token = $('#csrf').val();
-
-    
-    $.ajax({
-        type: "POST",
-        dataType: "json",
-        url: "Value" ,
-        data: {_token:token,id:id},//传参
-        success: function (data) {
-//            window.location.reload();
-        },
-    });
+ console.log($(this).data('id'));
 });
 
 SCRIPT;
@@ -40,7 +31,7 @@ SCRIPT;
     protected function render()
     {
         Admin::script($this->script());
-        return "<input class='form-control grid-check-row'  />";
+        return "<a class='grid-check-row' title='回信' href='".admin_url('mail').'/'.$this->id."/reply'><i class=\"fa fa-arrow-left\"></i></a>";
     }
 
     public function __toString()

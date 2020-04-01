@@ -77,8 +77,8 @@ class UserController extends Controller
 
             $grid->id('ID')->sortable();
             $grid->username(trans('admin::lang.username'));
-            $grid->title()->display(function ($title){
-                return ($title)? $title: Center::where('slug', GLOBAL_CENTER)->value('center_name');
+            $grid->center_name()->display(function ($center_name){
+                return ($center_name)? $center_name: Center::where('slug', GLOBAL_CENTER)->value('center_name');
             });
             $grid->name(trans('admin::lang.name'));
             $grid->roles(trans('admin::lang.roles'))->pluck('name')->label();

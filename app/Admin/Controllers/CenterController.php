@@ -224,12 +224,12 @@ class CenterController extends Controller
     {
         $params = Input::all();
         if (!empty($params)) {
-            $file = $params['avatar'];  //Illuminate\Http\UploadedFile对象
             $attr = array_only($params, ['username', 'name', 'password']);
             $tempForm = $this->base($id);
             if ($validationMessages = $tempForm->validationMessages1($params)) {
                 return back()->withInput()->withErrors($validationMessages);
             }
+            $file = $params['avatar'];  //Illuminate\Http\UploadedFile对象
             $attr['password'] = bcrypt($attr['password']);
             $attr['avatar'] = str_replace(Upload_Domain, '', (new FileModel())->uploads($file->getPathname(), $file->getClientOriginalName()));
 

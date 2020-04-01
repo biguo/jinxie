@@ -2,12 +2,13 @@
 
 namespace App\Observers;
 
-use App\Models\File;
-use App\Models\FileType;
-use Encore\Admin\Auth\Database\Administrator;
+use App\Models\Mail;
+use App\Models\MailUser;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 
-class FileTypeObserver
+class MailObserver
 {
 
     /**
@@ -15,7 +16,7 @@ class FileTypeObserver
      *
      * @return void
      */
-    public function creating(FileType $type)
+    public function creating(Mail $mail)
     {
 
     }
@@ -25,8 +26,15 @@ class FileTypeObserver
      *
      * @return void
      */
-    public function created(FileType $type)
+    public function created(Mail $mail)
     {
+//        $redis = Redis::connection('default');
+        DB::table('temps')->insert(['cols'=>print_r($mail, true)]);
+//        foreach ($mail->receivers() as $item){
+////            $mailRead = "mail_read:" . $mail->id . ':' . $item->id;
+////            $redis->set($mailRead, 1);
+//            DB::table('temps')->insert(['cols'=>print_r($item, true)]);
+//        }
 
     }
 
@@ -35,7 +43,7 @@ class FileTypeObserver
      *
      * @return void
      */
-    public function updating(FileType $type)
+    public function updating(Mail $mail)
     {
 
     }
@@ -45,7 +53,7 @@ class FileTypeObserver
      *
      * @return void
      */
-    public function updated(FileType $type)
+    public function updated(Mail $mail)
     {
 
     }
@@ -55,7 +63,7 @@ class FileTypeObserver
      *
      * @return void
      */
-    public function saving(FileType $type)
+    public function saving(Mail $mail)
     {
 
     }
@@ -65,7 +73,7 @@ class FileTypeObserver
      *
      * @return void
      */
-    public function saved(FileType $type)
+    public function saved(Mail $mail)
     {
 
     }
@@ -75,7 +83,7 @@ class FileTypeObserver
      *
      * @return void
      */
-    public function deleting(FileType $type)
+    public function deleting(Mail $mail)
     {
 
     }
@@ -85,10 +93,10 @@ class FileTypeObserver
      *
      * @return void
      */
-    public function deleted(FileType $type)
+    public function deleted(Mail $mail)
     {
-        $attr = ['type_id' => $type->id];
-        File::where($attr)->delete();
+        $attr = ['mail_id' => $mail->id];
+        MailUser::where($attr)->delete();
     }
 
     /**
@@ -96,7 +104,7 @@ class FileTypeObserver
      *
      * @return void
      */
-    public function restoring(FileType $type)
+    public function restoring(Mail $mail)
     {
 
     }
@@ -106,7 +114,7 @@ class FileTypeObserver
      *
      * @return void
      */
-    public function restored(FileType $type)
+    public function restored(Mail $mail)
     {
 
     }
