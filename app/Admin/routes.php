@@ -32,13 +32,9 @@ Route::group([
     $router->resource('types', FileTypeController::class); //附件自定义类型
 
     $router->any('mail/sended', 'MailController@sended');  // 发件箱
+    $router->any('mail/{id}/softDelete', 'MailController@softDelete');  //软删
+    $router->any('mail/{id}/show', 'MailController@show');  //查看
     $router->any('mail/{id}/reply', 'MailController@reply');  //回信
     $router->resource('mail', MailController::class); //站内邮件 收件箱
-
-    $router->any('reply/{id}', 'MailController@reply');  //回信
-    $router->any('replyed/{id}', 'MailController@replyed');
-    $router->any('reply', 'MailController@backList');  // 用于面包屑
-
-
 
 });

@@ -6,6 +6,7 @@ use App\Models\FileType;
 use App\Models\Mail;
 use App\Models\Project;
 use App\Observers\FileTypeObserver;
+use App\Observers\MailObserver;
 use App\Observers\ProjectObserver;
 use App\Observers\UserObserver;
 use Encore\Admin\Auth\Database\Administrator;
@@ -24,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
         Administrator::observe(UserObserver::class);
         Project::observe(ProjectObserver::class);
         FileType::observe(FileTypeObserver::class);
-        Mail::observe(MailObserver::class);
+//        Mail::observe(MailObserver::class);
     }
 
     /**

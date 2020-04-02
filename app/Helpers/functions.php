@@ -33,6 +33,10 @@ function visible($roles){
     return $admin->visible($roles);
 }
 
+function isAjax()
+{
+    return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
+}
 
 /**
  * 用法如下 用于获得执行sql

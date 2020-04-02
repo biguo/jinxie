@@ -28,13 +28,6 @@ class MailObserver
      */
     public function created(Mail $mail)
     {
-//        $redis = Redis::connection('default');
-        DB::table('temps')->insert(['cols'=>print_r($mail, true)]);
-//        foreach ($mail->receivers() as $item){
-////            $mailRead = "mail_read:" . $mail->id . ':' . $item->id;
-////            $redis->set($mailRead, 1);
-//            DB::table('temps')->insert(['cols'=>print_r($item, true)]);
-//        }
 
     }
 
@@ -95,8 +88,7 @@ class MailObserver
      */
     public function deleted(Mail $mail)
     {
-        $attr = ['mail_id' => $mail->id];
-        MailUser::where($attr)->delete();
+
     }
 
     /**

@@ -7,6 +7,7 @@ define('SmsCodeType_REGISTER',1);//注册
 
 define('Status_Online',1);//产品 在线
 define('Status_Offline',0);//下线
+define('Status_Deleted',2);//已删
 
 define('GLOBAL_CENTER','global-center');//总中心的slug
 

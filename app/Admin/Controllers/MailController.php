@@ -2,16 +2,18 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Extensions\BatchSoftDelete;
 use App\Admin\Extensions\CheckRow;
 use App\Http\Controllers\Controller;
 use App\Models\Mail;
+use App\Models\MailUser;
 use Encore\Admin\Auth\Database\Administrator;
 use Encore\Admin\Controllers\ModelForm;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\MessageBag;
 
 class MailController extends Controller
 {
@@ -59,11 +61,73 @@ class MailController extends Controller
     {
         return Admin::content(function (Content $content) use ($id) {
 
-            $content->header('header');
+            $content->header('编辑');
             $content->description('description');
 
             $content->body($this->form()->edit($id));
         });
+    }
+
+    /**
+     * show interface.
+     *
+     * @param $id
+     * @return Content
+     */
+    public function show($id)
+    {
+        return Admin::content(function (Content $content) use ($id) {
+
+            $content->header('详细页');
+            $content->description('description');
+
+            $show = Admin::form(Mail::class, function (Form $form) {
+
+                $form->display('id', 'ID');
+                $form->display('subject', '标题');
+                $form->multipleSelect('receivers', '收件人')->options(Administrator::all()->pluck('name', 'id'))->readOnly();
+
+                $form->display('content', 'content');
+                $form->tools(function (Form\Tools $tools) {
+                    $tools->disableListButton();
+                });
+            });
+
+            $content->body($show->view($id));
+        });
+    }
+
+    /**
+     * 删除邮件
+     *
+     * @param $id
+     */
+    public function softDelete($params)
+    {
+
+        $ids = explode(',', $params);
+        $tmp = implode(',', $ids);
+        foreach ($ids as $id) {
+
+            $where = ['user_id' => $this->mid, 'mail_id' => $id];
+            $relation = MailUser::where($where)->first();
+            if ($relation) {
+                $relation->status = Status_Deleted;
+                $relation->save();
+            } else {
+                $mail = Mail::find($id);
+                $mail->status = Status_Deleted;
+                $mail->save();
+            }
+        }
+        if (isAjax()) {
+            return response()->json([
+                'status' => true,
+                'message' => $tmp . trans('admin::lang.delete_succeeded'),
+            ]);
+        } else {
+            return back()->with('toastr', new MessageBag(['message' => $tmp . trans('admin::lang.delete_succeeded')]));
+        }
     }
 
     /**
@@ -79,10 +143,6 @@ class MailController extends Controller
             $content->header('回信');
             $content->description('description');
             $form = Admin::form(Mail::class, function (Form $form) use ($id) {
-                $redis = Redis::connection('default');
-                $mailRead = "mail_read:" . $id . ':' . $this->mid;
-                $weight = $redis->exists($mailRead) ? '500' : '900';
-
                 $mail = Mail::find($id);
                 $items = array_map(function ($item) {
                     return '<span style="font-size: 16px;font-weight: 900;">' . $item['name'] . '</span>';
@@ -113,7 +173,7 @@ class MailController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('header');
+            $content->header('写信');
             $content->description('description');
 
             $content->body($this->form());
@@ -134,22 +194,20 @@ class MailController extends Controller
             if ($number === 0) {
                 $model->Leftjoin('mail_user as r', 'm.id', '=', 'r.mail_id')
                     ->where('r.user_id', $this->mid)
+                    ->where('r.status','!=', Status_Deleted )
                     ->select('m.*');
             } else {
                 $grid->model()->from('mail as m')
+                    ->where('status','!=', Status_Deleted )
                     ->where('sender_id', $this->mid);
             }
             $grid->id('ID')->sortable();
 
             if ($number === 0) {
-                $redis = Redis::connection('default');
-                $mid = $this->mid;
-                $grid->subject('主题')->display(function ($item) use ($redis, $mid) {
-                    $mailRead = "mail_read:" . $this->id . ':' . $mid;
-                    $weight = $redis->exists($mailRead) ? '500' : '900';
-                    return "<span style='font-weight:" . $weight . "'>{$item}</span>";
+                $grid->subject('主题')->display(function ($item) {
+                    return "<span style='font-weight:500'>{$item}</span>";
                 });
-            } else {
+            } else {                # 寄件箱
                 $grid->disableCreation();
                 $grid->subject('主题');
             }
@@ -175,6 +233,14 @@ class MailController extends Controller
                 // 添加操作
                 $actions->append(new CheckRow($actions->getKey()));
                 $actions->disableEdit();
+                $actions->disableDelete();
+            });
+            $grid->setView('admin::grid.mailtable');
+            $grid->tools(function (Grid\Tools $tools) {
+                $tools->batch(function (Grid\Tools\BatchActions $actions) {
+                    $actions->disableDelete();
+                    $actions->add(trans('admin::lang.delete'), new BatchSoftDelete()); #禁止批量删除之后载入自定义批量删除
+                });
             });
         });
     }
