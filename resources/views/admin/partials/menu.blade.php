@@ -3,7 +3,7 @@
 {{--@if(Admin::user()->visible($item['roles']))--}}
     @if(!isset($item['children']))
         <li>
-            <a href="{{ Admin::url($item['uri']) }}"><i class="fa {{$item['icon']}}"></i>
+            <a href="{{ Admin::url($item['uri']) }}" class="linked"><i class="fa {{$item['icon']}}"></i>
                 <span>{{$item['title']}}</span>
             </a>
         </li>
@@ -11,7 +11,7 @@
         <li class="treeview">
             <a href="#">
                 <i class="fa {{$item['icon']}}"></i>
-                <span>{{$item['title']}}</span>
+                <span id="span_{{$item['id']}}">{{$item['title']}}</span>
                 <i class="fa fa-angle-left pull-right"></i>
             </a>
             <ul class="treeview-menu">

@@ -4,10 +4,22 @@ use Illuminate\Routing\Router;
 
 Admin::registerHelpersRoutes();
 
+//Route::get('admin/register', 'App\Admin\Controllers\AuthController@getRegister');
+//Route::post('admin/register', 'App\Admin\Controllers\AuthController@postRegister');
+
 Route::group([
-    'prefix'        => config('admin.prefix'),
-    'namespace'     => Admin::controllerNamespace(),
-    'middleware'    => ['web', 'admin'],
+    'prefix' => config('admin.prefix'),
+    'namespace' => Admin::controllerNamespace(),
+    'middleware' => ['web']
+], function (Router $router) {
+    $router->get('register', 'AuthController@getRegister');
+    $router->post('register', 'AuthController@postRegister');
+});
+
+Route::group([
+    'prefix' => config('admin.prefix'),
+    'namespace' => Admin::controllerNamespace(),
+    'middleware' => ['web', 'admin'],
 ], function (Router $router) {
 
     $router->get('/', 'HomeController@index');
@@ -15,6 +27,11 @@ Route::group([
     $router->resource('center', CenterController::class);
 
     $router->resource('auth/users', 'UserController');
+    $router->get('auth/login', 'AuthController@getLogin');
+    $router->post('auth/login', 'AuthController@postLogin');
+    $router->get('auth/logout', 'AuthController@getLogout');
+    $router->get('auth/setting', 'AuthController@getSetting');
+    $router->put('auth/setting', 'AuthController@putSetting');
 
     $router->any('createAdmin/{id}', 'CenterController@createAdmin');   //设置中心分中心管理员
     $router->any('setAdmin/{id}', 'CenterController@setAdmin');

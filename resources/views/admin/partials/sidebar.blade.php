@@ -38,3 +38,26 @@
     </section>
     <!-- /.sidebar -->
 </aside>
+
+
+<script>
+    $(document).ready(function () {
+        getObj();
+    });
+
+    function getObj() {
+        let current_uri = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
+        let app_url = window.location.protocol + '//' + window.location.hostname;
+        let temp_id = '';
+        $('.linked').each(function () {
+            let href = app_url + $(this).attr('href').split('?')[0];
+            if(current_uri === href){
+                temp_id = $(this).parent().parent().parent().find('span').attr('id');
+                return false;
+            }
+        });
+        if(temp_id !== ''){
+            $('#'+temp_id).click();
+        }
+    }
+</script>

@@ -76,6 +76,7 @@ class MailController extends Controller
      */
     public function show($id)
     {
+        MailUser::where(['user_id' => $this->mid, 'mail_id' => $id])->update(['status' => Status_Read]);
         return Admin::content(function (Content $content) use ($id) {
 
             $content->header('详细页');
@@ -100,7 +101,8 @@ class MailController extends Controller
     /**
      * 删除邮件
      *
-     * @param $id
+     * @param $params
+     * @return mixed
      */
     public function softDelete($params)
     {
@@ -195,17 +197,20 @@ class MailController extends Controller
                 $model->Leftjoin('mail_user as r', 'm.id', '=', 'r.mail_id')
                     ->where('r.user_id', $this->mid)
                     ->where('r.status','!=', Status_Deleted )
-                    ->select('m.*');
+                    ->select('m.*', 'r.status as r_status')
+                    ->orderBy('m.created_at','desc');
             } else {
                 $grid->model()->from('mail as m')
                     ->where('status','!=', Status_Deleted )
-                    ->where('sender_id', $this->mid);
+                    ->where('sender_id', $this->mid)
+                    ->orderBy('m.created_at','desc');
             }
             $grid->id('ID')->sortable();
 
             if ($number === 0) {
-                $grid->subject('主题')->display(function ($item) {
-                    return "<span style='font-weight:500'>{$item}</span>";
+                $grid->column('主题')->display(function () {
+                    $bold = ($this->r_status == Status_Unread)? 900 : 500;
+                    return "<span style='font-weight:$bold'>{$this->subject}</span>";
                 });
             } else {                # 寄件箱
                 $grid->disableCreation();
@@ -221,8 +226,6 @@ class MailController extends Controller
                 return join('&nbsp;', $items);
             });
             $grid->created_at('创建于');
-            $grid->updated_at('更新于');
-
             $grid->disableExport();
             $grid->filter(function ($filter) {
                 $filter->disableIdFilter();
