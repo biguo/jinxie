@@ -53,7 +53,7 @@ class AuthController extends Controller
             $params = $credentials;
             $params['password'] = bcrypt($params['password']);
             $params['avatar'] = Default_Pic;
-            Administrator::insert($params);
+            Administrator::create($params);
         }
         if (Auth::guard('admin')->attempt($request->only(['username','password']))) {
             admin_toastr(trans('admin::lang.login_successful'));

@@ -29,10 +29,10 @@ class HomeController extends Controller
             $content->description('Description...');
 
             $content->row(function ($row) {
-                $row->column(3, new InfoBox('New Users', 'users', 'aqua', '/admin/users', '1024'));
-                $row->column(3, new InfoBox('New Orders', 'shopping-cart', 'green', '/admin/orders', '150%'));
-                $row->column(3, new InfoBox('Product', 'book', 'yellow', '/admin/product', '2786'));
-                $row->column(3, new InfoBox('Infos', 'file', 'red', '/admin/banner', '698726'));
+                $row->column(3, new InfoBox('New Users', 'users', 'aqua', '#', '1024'));
+                $row->column(3, new InfoBox('New Orders', 'shopping-cart', 'green', '#', '150%'));
+                $row->column(3, new InfoBox('Product', 'book', 'yellow', '#', '2786'));
+                $row->column(3, new InfoBox('Infos', 'file', 'red', '#', '698726'));
             });
 
             $content->row(function (Row $row) {
@@ -50,7 +50,7 @@ class HomeController extends Controller
                     $tab->add('Table', new Table());
                     $tab->add('Text', 'blablablabla....');
 
-                    $tab->dropDown([['Orders', '/admin/orders'], ['administrators', '/admin/administrators']]);
+                    $tab->dropDown([['Orders', '#'], ['administrators', '#']]);
                     $tab->title('Tabs');
 
                     $column->append($tab);
