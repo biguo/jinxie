@@ -62,6 +62,9 @@
           <button type="submit" class="btn btn-primary btn-block btn-flat">{{ trans('admin::lang.login') }}</button>
         </div>
         <!-- /.col -->
+        <div>
+          <a href="{{ Admin::url('register') }}" style="float: right;font-size: 12px;margin: 10px;">没有账号? 注册</a>
+        </div>
       </div>
     </form>
 

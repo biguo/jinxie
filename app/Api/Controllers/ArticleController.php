@@ -32,6 +32,19 @@ class ArticleController extends BaseController
         return responseSuccess($data);
     }
 
+    public function search()
+    {
+        $params = Input::all();
+        $where = [['status', '=', Status_Online]];
+        $perPage = isset($params['perPage']) ? $params['perPage'] : 5;
+        $page = isset($params['page']) ? $params['page'] : 1;
+        if(isset($params['kwd'])){
+            array_push($where, ['title', 'like', '%'.$params['kwd'].'%']);
+        }
+        $data = Article::join('admin_users as u', 'article.mid', '=', 'u.id')->where($where)->paginate($perPage, ['article.id','title','u.name','article.created_at'], 'page', $page);
+        return responseSuccess($data);
+    }
+
     public function getCenters()
     {
         $params = Input::all();

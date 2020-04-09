@@ -73,6 +73,9 @@
           <button type="submit" class="btn btn-primary btn-block btn-flat">{{ trans('admin::lang.login') }}</button>
         </div>
         <!-- /.col -->
+        <div>
+          <a href="{{ Admin::url('auth/login') }}" style="float: right;font-size: 12px;margin: 10px;">已有账号? 登录</a>
+        </div>
       </div>
     </form>
 

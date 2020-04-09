@@ -188,11 +188,13 @@ class ProjectControllers extends Controller
             $form->text('title')->rules('required');
             $form->textarea('description');
 
-            $options = CenterUser::from('admin_center_users as r')
-                ->leftJoin('admin_users as u', 'u.id', '=', 'r.user_id')
-                ->where('r.center_id', $this->center)
+            $options = CenterUser::from('admin_users as u')
+                ->leftJoin('admin_center_users as r', function ($join) {
+                    $join->on('u.id', '=', 'r.user_id')
+                        ->where('r.center_id', '=', $this->center);
+                })
                 ->pluck('u.name', 'u.id')->toarray();
-//            });
+
             $options = ['' => '请选择'] + $options;
             $form->select('to', '发送给')->options($options);
 

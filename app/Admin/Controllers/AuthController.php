@@ -58,7 +58,7 @@ class AuthController extends Controller
         if (Auth::guard('admin')->attempt($request->only(['username','password']))) {
             admin_toastr(trans('admin::lang.login_successful'));
 
-            return redirect()->intended(config('admin.prefix'));
+            return redirect()->to('admin/mail');
         }
         return Redirect::back()->withInput()->withErrors(['username' => $this->getFailedLoginMessage()]);
     }

@@ -19,8 +19,7 @@ define('BRANCH_ADMIN','branch-admin');//分中心管理员
 define('RESEARCHER','Researcher');//研究员
 
 define('Upload_Domain','http://upload.binghuozhijia.com/');//七牛
-define('Default_Icon','http://upload.binghuozhijia.com/image/pt.jpg');//默认等级
-define('Default_Pic','http://bhzj.binghuozhijia.com/test/bhzj/public/sample/default_pic.png');//默认头像
+define('Default_Pic','uploads/5e8e8413016ea/5e8e84130169f.jpg');//默认头像
 
 
 

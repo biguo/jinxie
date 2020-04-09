@@ -29,6 +29,7 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers','middleware' => 'vue']
 
     $api->any('banner/list', 'BannerController@getList');  //轮播图
     $api->any('article/list', 'ArticleController@getList');  //文章列表
+    $api->any('article/search', 'ArticleController@search');  //文章搜索
     $api->any('center/list', 'ArticleController@getCenters');  //中心列表
 
 
