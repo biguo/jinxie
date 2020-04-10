@@ -45,6 +45,12 @@ class ArticleController extends BaseController
         return responseSuccess($data);
     }
 
+    public function show($id)
+    {
+        $article = Article::where([['status', '=', Status_Online],['id','=',$id]])->first();
+        return responseSuccess($article);
+    }
+
     public function getCenters()
     {
         $params = Input::all();
