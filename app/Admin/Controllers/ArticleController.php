@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Article;
 use App\Models\Category;
 use App\Models\Center;
+use Encore\Admin\Auth\Database\Administrator;
 use Encore\Admin\Controllers\ModelForm;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Auth;
 
 class ArticleController extends Controller
 {
@@ -78,11 +80,18 @@ class ArticleController extends Controller
     {
 
         return Admin::grid(Article::class, function (Grid $grid) {
-            $grid->model()->from('article as a')
-                ->join('category as c', 'c.id', '=', 'a.type_id')
-                ->join('center as ce', 'ce.id', '=', 'a.center_id')
-                ->where('center_id', $this->center)
-                ->select('a.title as at','a.image', 'a.status', 'a.sort','a.id','c.name', 'ce.center_name as ct');
+            if(Admin::user()->inRoles([CENTER_ADMIN, SUPER])){  #超管和中心管理可以替分管写文章
+                $grid->model()->from('article as a')
+                    ->join('category as c', 'c.id', '=', 'a.type_id')
+                    ->join('center as ce', 'ce.id', '=', 'a.center_id')
+                    ->select('a.title as at','a.image', 'a.status', 'a.sort','a.id','c.name', 'ce.center_name as ct');
+            }else{
+                $grid->model()->from('article as a')
+                    ->join('category as c', 'c.id', '=', 'a.type_id')
+                    ->join('center as ce', 'ce.id', '=', 'a.center_id')
+                    ->where('center_id', $this->center)
+                    ->select('a.title as at','a.image', 'a.status', 'a.sort','a.id','c.name', 'ce.center_name as ct');
+            }
 
             $grid->id('ID')->sortable();
             $grid->column('at','title')->display(function ($title){
@@ -123,9 +132,14 @@ class ArticleController extends Controller
             $form->textarea('title', 'title')->rules('required|min:3');
             $form->ckeditor('content', 'content');
             $form->image('image', 'image');
-            $array = Category::pluck('name', 'id')->toarray();
-            $form->select('type_id', '类型')->options(['' => '请选择'] + $array)->rules('required');
-            $form->hidden('center_id')->value($this->center);
+            $form->select('type_id', '类型')->options(['' => '请选择'] + Category::pluck('name', 'id')->toarray())->rules('required');
+            if(Admin::user()->inRoles([CENTER_ADMIN, SUPER])){  #超管和中心管理可以替分管写文章
+                $form->select('center_id', '中心')
+                    ->options(['' => '请选择'] + Center::pluck('center_name', 'id')->toarray())
+                    ->rules('required')->value($this->center);
+            }else{
+                $form->hidden('center_id')->value($this->center);
+            }
             $form->hidden('mid')->value($this->mid);
             $form->hidden('sort');
             $form->hidden('status');

@@ -14,6 +14,7 @@ define('Status_Unread',0);//未读
 
 define('GLOBAL_CENTER','global-center');//总中心的slug
 
+define('SUPER','administrator');//超管
 define('CENTER_ADMIN','center-admin');//中心管理员
 define('BRANCH_ADMIN','branch-admin');//分中心管理员
 define('RESEARCHER','Researcher');//研究员

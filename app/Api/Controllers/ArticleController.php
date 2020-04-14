@@ -17,13 +17,8 @@ class ArticleController extends BaseController
         isset($params['type']) ? array_push($where, ['type_id', '=', $params['type']]) : null;
         $perPage = isset($params['perPage']) ? $params['perPage'] : 5;
         $page = isset($params['page']) ? $params['page'] : 1;
-        if(isset($params['global'])){
-            $gid = Center::where('slug', GLOBAL_CENTER)->value('id');
-            if($params['global'] == '1'){
-                array_push($where, ['center_id', '=', $gid]);
-            }else{
-                array_push($where, ['center_id', '!=', $gid]);
-            }
+        if(isset($params['cid'])){
+            array_push($where, ['center_id', '=', $params['cid']]);
         }
         $data = Article::where($where)->paginate($perPage, ['*'], 'page', $page);
         foreach ($data as $item){
@@ -48,6 +43,11 @@ class ArticleController extends BaseController
     public function show($id)
     {
         $article = Article::where([['status', '=', Status_Online],['id','=',$id]])->first();
+        if($article && $article->image){
+            $article->image = Upload_Domain.$article->image;
+        }else{
+            $article->image = '';
+        }
         return responseSuccess($article);
     }
 
