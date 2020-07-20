@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Category;
 use App\Models\File;
 
 use App\Models\FileType;
@@ -75,13 +76,11 @@ class FileController extends Controller
     {
         return Admin::grid(File::class, function (Grid $grid) {
             $grid->model()->from('files as a')
-                ->join('file_type as c', 'c.id', '=', 'a.type_id')
-                ->where('mid', $this->mid)
-                ->select('a.*', 'c.name as type');
+                ->join('category as c', 'c.id', '=', 'a.type_id')
+                ->select('a.*', 'c.name as type')->orderBy('id', 'desc');
 
-            $grid->model()->where('mid', $this->mid)->orderBy('id', 'desc');
             $grid->id('ID')->sortable();
-            $grid->column('title', '标题')->editable();
+            $grid->column('title', '标题');
             $grid->path('路径')->display(function ($path) {
                 return '<a href="'.Upload_Domain.$path.'" target="_blank">'.$path.'</a>';
             });
@@ -89,6 +88,10 @@ class FileController extends Controller
             $grid->created_at();
             $grid->updated_at();
             $grid->disableExport();
+            $grid->actions(function ($actions) {
+                // 添加操作
+                $actions->disableEdit();
+            });
             $grid->filter(function ($filter) {
 //                $filter->useModal();
                 $filter->disableIdFilter();
@@ -111,8 +114,7 @@ class FileController extends Controller
             $form->display('id', 'ID');
             $form->text('title', 'title')->rules('required|min:3');
             $form->file('path', 'path')->rules('required');
-            $array = FileType::pluck('name', 'id')->toarray();
-            $form->select('type_id', '类型')->options(['' => '请选择'] + $array)->rules('required');
+            $form->select('type_id', '类型')->options(['' => '请选择'] + Category::pluck('name', 'id')->toarray())->rules('required');
             $form->hidden('center_id' )->default($this->center);
             $form->hidden('mid')->default($this->mid);
             $form->display('created_at', 'Created At');

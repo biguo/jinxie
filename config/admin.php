@@ -5,12 +5,12 @@ return [
     /*
      * Laravel-admin name.
      */
-    'name'      => '警察协会后台管理系统',
+    'name'      => '城市警务研究中心',
 
     /*
      * Logo in admin panel header.
      */
-    'logo'      => '<b>警察协会后台</b> 管理',
+    'logo'      => '<b>城市警务</b> 研究',
 
     /*
      * Mini-logo in admin panel header.
@@ -30,7 +30,7 @@ return [
     /*
      * Laravel-admin html title.
      */
-    'title'  => '警察协会|后台管理系统',
+    'title'  => '城市警务|后台管理系统',
 
     /*
      * Laravel-admin auth setting.

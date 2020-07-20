@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Article;
 use App\Models\Category;
 use App\Models\Center;
+use App\Models\File;
 use Encore\Admin\Auth\Database\Administrator;
 use Encore\Admin\Controllers\ModelForm;
 use Encore\Admin\Facades\Admin;
@@ -132,6 +133,7 @@ class ArticleController extends Controller
             $form->textarea('title', 'title')->rules('required|min:3');
             $form->ckeditor('content', 'content');
             $form->image('image', 'image');
+            $form->file('file', 'file')->options(['initialPreviewConfig'  => [[ 'type' => 'pdf']]]);
             $form->select('type_id', '类型')->options(['' => '请选择'] + Category::pluck('name', 'id')->toarray())->rules('required');
             if(Admin::user()->inRoles([CENTER_ADMIN, SUPER])){  #超管和中心管理可以替分管写文章
                 $form->select('center_id', '中心')
@@ -145,6 +147,14 @@ class ArticleController extends Controller
             $form->hidden('status');
             $form->display('created_at', 'Created At');
             $form->display('updated_at', 'Updated At');
+            $form->saved(function (Form $form){
+                if($form->model()->file ){
+                    $arr = array_only($form->model()->toArray(), ['title','type_id','center_id', 'mid', 'file']);
+                    $arr['path'] = $arr['file'];
+                    unset($arr['file']);
+                    File::create($arr);
+                }
+            });
         });
     }
 }
