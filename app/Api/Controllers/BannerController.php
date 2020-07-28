@@ -13,6 +13,16 @@ class BannerController extends BaseController
         return responseSuccess($banners);
     }
 
+    public function show($id)
+    {
+        $banner = Banner::where([['status', '=', Status_Online],['id','=',$id]])->first();
+        if($banner && $banner->image){
+            $banner->image = Upload_Domain.$banner->image;
+        }else{
+            $banner->image = '';
+        }
+        return responseSuccess($banner);
+    }
 
 
 }
